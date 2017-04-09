@@ -8,8 +8,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class Usuario {	
-	public static void main(String [] args) throws IOException{
-		
+	public static void main(String [] args) throws IOException, InterruptedException{
+		int port;
                 InetAddress ip;
 		byte[] sendData = new byte[1024];
 		byte[] receiveData = new byte[1024];
@@ -17,23 +17,18 @@ public class Usuario {
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 DatagramPacket sendPacket; new DatagramPacket(sendData,sendData.length);
 		MulticastSocket mSocket = new MulticastSocket(3333);
-		String group = "224.0.0.1";		
+		String group = "224.0.0.2";		
 		mSocket.joinGroup(InetAddress.getByName(group));
 		mSocket.receive(receivePacket);
                 
                 
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),
 				receivePacket.getLength());
-		System.out.println(resposta);
-                
-                String[] ipPort = resposta.split(":");
-                ip = InetAddress.getByName(ipPort[0]);
-                int port = Integer.parseInt(ipPort[1]);
+                port = Integer.parseInt(resposta);
                 
                 String id = ManagementFactory.getRuntimeMXBean().getName();
                 sendData = id.getBytes();
-		DatagramPacket pacote = new DatagramPacket(sendData, sendData.length,ip , port);
-
+		DatagramPacket pacote = new DatagramPacket(sendData, sendData.length,receivePacket.getAddress() , port);
                 mSocket.send(pacote);
 
                 
